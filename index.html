@@ -1,3 +1,146 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <style>
+            canvas{
+                border: none;
+                outline: none;
+                position: absolute;
+                top: 20vh;
+            }
+            #cssanim{
+                animation-timing-function: linear;
+                animation: 5s infinite alternate anim;
+                position: absolute;
+                padding: 1%;
+                top: 7.5vh;
+            }
+            #label{
+                position: absolute;
+                top: 18vh;
+            }
+            @keyframes anim{
+                from{
+                    left: 1vw;
+                    background: red;
+                    border-radius: 10px;
+                    transform: rotate(0deg);
+                }
+                15% {
+                    background: orange;
+                    border-radius: 15px;
+                    left: 5vw;
+                    transform: rotate(72deg);
+                }
+                35% {
+                    background: yellow;
+                    border-radius: 20px;
+                    left: 12vw;
+                    transform: rotate(144deg);
+                }
+                57.5% {
+                    background: lightgreen;
+                    border-radius: 25px;
+                    left: 25vw;
+                    transform: rotate(216deg);
+                }
+                80% {
+                    background: blue;
+                    border-radius: 30px;
+                    left: 38vw;
+                    transform: rotate(288deg);
+                }
+                100%{
+                    background: purple;
+                    border-radius: 35px;
+                    left: 50vw;
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="cssanim">CSS ANIMATIONS</div>
+        <div id="label">Snake Game:</div>
+        <canvas width = "500" height = "500" tabindex="1">A demo snake game</canvas>
+        <script>
+            const c = document.querySelector("canvas");
+            const ctx = c.getContext("2d");
+            const randint = (max) => {
+                return Math.floor(Math.random() * max);
+            }
+            var direction = " ";
+            var add = null;
+            var apple = [randint(20), randint(20)];
+            class Segment{
+                constructor(x, y, isHead){
+                    this.x = x;
+                    this.y = y;
+                    this.isHead = isHead;
+                }
+            }
+            var segments = [new Segment(1, 1, false), new Segment(2, 1, true)];
+            const renderApple = (x, y) => {
+                ctx.fillStyle = "red";
+                ctx.fillRect(x*25, y*25, 25, 25);
+            }
+            const renderSnakeSegment = (segment) =>{
+                ctx.fillStyle = segment.isHead ? "darkblue" : "blue";
+                ctx.fillRect(segment.x*25, segment.y*25, 25, 25);
+            }
+            c.addEventListener("keydown", (e) => {
+                if("wasd".includes(e.key.toLowerCase())){
+                    direction = e.key.toLowerCase()
+                }
+            });
+            ctx.fillStyle = "green";
+            ctx.fillRect(0,0,500,500);
+            for(var i = 0; i < segments.length; i += 1){
+                renderSnakeSegment(segments[i]);
+            }
+            renderApple(apple[0], apple[1]);
+            setInterval(()=>{
+                if(segments[segments.length - 1].x == 20 || segments[segments.length - 1].x == -1 || segments[segments.length - 1].y == 20 || segments[segments.length - 1].y == -1){
+                    alert("GAME OVER! Finished with a score of "+(segments.length-2).toString()+"!");
+                    window.location.reload();
+                }
+                if(segments[segments.length - 1].x == apple[0] && segments[segments.length - 1].y == apple[1]){
+                    add = new Segment(segments[0].x, segments[0].y, false);
+                    apple = [randint(20), randint(20)];
+                }
+                if(!"wasd".includes(direction)){
+                    return;
+                }
+                ctx.fillStyle = "green";
+                ctx.fillRect(0,0,500,500);
+                renderApple(apple[0], apple[1]);
+                for(var i = 0; i < segments.length; i += 1){
+                    if(i == segments.length - 1){
+                        switch(direction){
+                            case 'w':
+                                segments[i].y -= 1;
+                                break;
+                            case 'a':
+                                segments[i].x -= 1;
+                                break;
+                            case 's':
+                                segments[i].y += 1;
+                                break;
+                            case 'd':
+                                segments[i].x += 1;
+                                break;
+                        }
+                    }else{
+                        segments[i].x = segments[i + 1].x;
+                        segments[i].y = segments[i + 1].y;
+                    }
+                    renderSnakeSegment(segments[i]);
+                }
+                if(add != null){
+                    segments.unshift(add);
+                    add = null;
+                }
+            }, 200);
+        </script>
+    </body>
 </html>
